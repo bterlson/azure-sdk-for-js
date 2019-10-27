@@ -1,5 +1,9 @@
 # Breaking Changes
 
+## 2019.11 12.0.0-preview.6
+
+- The default browser bundle has been removed from the npm package. Bundling your application with a bundler such as Webpack is the recommended approach to building a browser bundle.
+
 ## 2019.11 12.0.0-preview.5
 
 - [Breaking] `IPRange` is renamed to `SasIPRange`. [PR #5551](https://github.com/Azure/azure-sdk-for-js/pull/5551)
