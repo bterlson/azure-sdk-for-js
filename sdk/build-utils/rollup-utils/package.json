@@ -1,0 +1,33 @@
+{
+  "name": "@azure/rollup-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/buildConfig.js",
+  "module": "./dist-esm/buildConfig.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "@rollup/plugin-replace": "^2.2.0",
+    "builtin-modules": "~3.1.0",
+    "rollup": "^1.16.3",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-multi-entry": "^2.1.0",
+    "rollup-plugin-node-resolve": "^5.0.2",
+    "rollup-plugin-replace": "~2.2.0",
+    "rollup-plugin-shim": "^1.0.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-terser": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.0",
+    "@types/rollup-plugin-json": "~3.0.2",
+    "@types/rollup-plugin-sourcemaps": "~0.4.2",
+    "typescript": "~3.6.4"
+  }
+}

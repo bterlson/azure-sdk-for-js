@@ -88,7 +88,7 @@ export function nodeConfig(test = false) {
 
 export function browserConfig(test = false) {
   const baseConfig = {
-    input: "dist-esm/src/index.browser.js",
+    input: "dist-esm/src/index.js",
     output: {
       file: "browser/azure-storage-blob.js",
       banner: banner,
