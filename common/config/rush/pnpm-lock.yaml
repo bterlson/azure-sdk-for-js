@@ -19,6 +19,7 @@ dependencies:
   '@rush-temp/keyvault-keys': 'file:projects/keyvault-keys.tgz'
   '@rush-temp/keyvault-secrets': 'file:projects/keyvault-secrets.tgz'
   '@rush-temp/logger': 'file:projects/logger.tgz'
+  '@rush-temp/rollup-utils': 'file:projects/rollup-utils.tgz'
   '@rush-temp/service-bus': 'file:projects/service-bus.tgz'
   '@rush-temp/storage-blob': 'file:projects/storage-blob.tgz'
   '@rush-temp/storage-file-datalake': 'file:projects/storage-file-datalake.tgz'
@@ -634,6 +635,20 @@ packages:
     dev: false
     resolution:
       integrity: sha512-auApPaJf3NPfe18hSoJkp8EbZzer2ISk7o8mCC3M9he/a04+gbMF97NkpD2S8riMGvm4BMRI59/SZQSaLTKpsQ==
+  /@types/rollup-plugin-json/3.0.2:
+    dependencies:
+      '@types/node': 13.1.2
+      rollup: 0.63.5
+    dev: false
+    resolution:
+      integrity: sha512-eTRym5nG4HEKDR/KrTnCMYwF7V0hgVjEesvtJCK3V8ho/aT0ZFRFgsDtx38VarM30HCsN372+i4FKYwnhcwiVA==
+  /@types/rollup-plugin-sourcemaps/0.4.2:
+    dependencies:
+      '@types/node': 13.1.2
+      rollup: 0.63.5
+    dev: false
+    resolution:
+      integrity: sha512-dqF1rMFy4O8yNlQYwYPos5Cfav0f6M7PLH8B33gsslQ0zA9MX1jMGokwNuJ3Z3EXAzsKF/xAWNHpFmELcgYJww==
   /@types/semaphore/1.1.0:
     dev: false
     resolution:
@@ -7808,6 +7823,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-ptg9PQwzs3orn4jkgXJ74bfs5vYz1NCZlSQMBUA0wKcGp5i5pA1AO3fOUEte8enhGUC+iapTCzEWw2jEFFUO/w==
+  /rollup-plugin-json/4.0.0:
+    dependencies:
+      rollup-pluginutils: 2.8.2
+    deprecated: This module has been deprecated and is no longer maintained. Please use @rollup/plugin-json.
+    dev: false
+    resolution:
+      integrity: sha512-hgb8N7Cgfw5SZAkb3jf0QXii6QX/FOkiIq2M7BAQIEydjHvTyxXHQiIzZaTFgx1GK0cRCHOCBHIyEkkLdWKxow==
   /rollup-plugin-local-resolve/1.0.7:
     dev: false
     resolution:
@@ -7844,6 +7866,14 @@ packages:
       rollup: '>=1.11.0'
     resolution:
       integrity: sha512-jUlyaDXts7TW2CqQ4GaO5VJ4PwwaV8VUGA7+km3n6k6xtOEacf61u0VXwN80phY/evMcaS+9eIeJ9MOyDxt5Zw==
+  /rollup-plugin-replace/2.2.0:
+    dependencies:
+      magic-string: 0.25.4
+      rollup-pluginutils: 2.8.2
+    deprecated: This module has moved and is now available at @rollup/plugin-replace. Please update your dependencies. This version is no longer maintained.
+    dev: false
+    resolution:
+      integrity: sha512-/5bxtUPkDHyBJAKketb4NfaeZjL5yLZdeUihSfbF2PQMz+rSTEb8ARKoOl3UBT4m7/X+QOXJo3sLTcq+yMMYTA==
   /rollup-plugin-shim/1.0.0:
     dev: false
     resolution:
@@ -7909,6 +7939,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==
+  /rollup/0.63.5:
+    dependencies:
+      '@types/estree': 0.0.39
+      '@types/node': 13.1.2
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-dFf8LpUNzIj3oE0vCvobX6rqOzHzLBoblyFp+3znPbjiSmSvOoK2kMKx+Fv9jYduG1rvcCfCveSgEaQHjWRF6g==
   /rollup/1.27.14:
     dependencies:
       '@types/estree': 0.0.41
@@ -10933,6 +10971,29 @@ packages:
       integrity: sha512-24XoWzt5xULbqfM03rvw7BAOjOKcqcUf/VQXOPPcI1z2q1iZMkP7VOnRmkIH+HzXMvj6jctcC43+KvLq4FdxgQ==
       tarball: 'file:projects/logger.tgz'
     version: 0.0.0
+  'file:projects/rollup-utils.tgz':
+    dependencies:
+      '@rollup/plugin-replace': 2.3.0_rollup@1.27.14
+      '@types/node': 8.10.59
+      '@types/rollup-plugin-json': 3.0.2
+      '@types/rollup-plugin-sourcemaps': 0.4.2
+      builtin-modules: 3.1.0
+      rollup: 1.27.14
+      rollup-plugin-commonjs: 10.1.0_rollup@1.27.14
+      rollup-plugin-json: 4.0.0
+      rollup-plugin-multi-entry: 2.1.0
+      rollup-plugin-node-resolve: 5.2.0_rollup@1.27.14
+      rollup-plugin-replace: 2.2.0
+      rollup-plugin-shim: 1.0.0
+      rollup-plugin-sourcemaps: 0.4.2_rollup@1.27.14
+      rollup-plugin-terser: 5.1.3_rollup@1.27.14
+      typescript: 3.6.4
+    dev: false
+    name: '@rush-temp/rollup-utils'
+    resolution:
+      integrity: sha512-Czhvi9AmKbJDnuxoGV3ZO1jJ+ou04XDHxzcqIi5/AGauDZT5vWD8lzLdP2UtLvIFBXI6ZJnn13ZN3uAUv9MqYQ==
+      tarball: 'file:projects/rollup-utils.tgz'
+    version: 0.0.0
   'file:projects/service-bus.tgz':
     dependencies:
       '@azure/amqp-common': 1.0.0-preview.9
@@ -11407,6 +11468,7 @@ specifiers:
   '@rush-temp/keyvault-keys': 'file:./projects/keyvault-keys.tgz'
   '@rush-temp/keyvault-secrets': 'file:./projects/keyvault-secrets.tgz'
   '@rush-temp/logger': 'file:./projects/logger.tgz'
+  '@rush-temp/rollup-utils': 'file:./projects/rollup-utils.tgz'
   '@rush-temp/service-bus': 'file:./projects/service-bus.tgz'
   '@rush-temp/storage-blob': 'file:./projects/storage-blob.tgz'
   '@rush-temp/storage-file-datalake': 'file:./projects/storage-file-datalake.tgz'

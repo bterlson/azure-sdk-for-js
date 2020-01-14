@@ -1,6 +1,6 @@
 import shim from "rollup-plugin-shim";
-import { AzureBuildTargetOptions, AzureBuildOptions } from "../AzureBuildOptions";
+import { AzureTargetDefinition, AzureBuildTarget } from "../AzureBuildOptions";
 
-export default function(_target: AzureBuildTargetOptions, options: AzureBuildOptions) {
-  return shim(options.shims);
+export default function(target: AzureBuildTarget, targetDef: AzureTargetDefinition) {
+  return shim(targetDef.shims);
 }

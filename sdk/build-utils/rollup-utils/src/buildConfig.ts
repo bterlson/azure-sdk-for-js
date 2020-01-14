@@ -1,63 +1,83 @@
 import { RollupOptions, RollupBuild } from "rollup";
-import { AzureBuildOptions, AzureBuildTargetOptions } from "./AzureBuildOptions";
+import {
+  AzureLibraryDefinition,
+  AzureTargetDefinition,
+  AzureLibraryBuildOptions,
+  isBuildTargetList,
+  AZURE_BUILD_TARGETS,
+  AzureBuildTarget,
+  isTestTarget
+} from "./AzureBuildOptions";
 import nodeBuiltins from "builtin-modules";
 import { join, basename, extname } from "path";
 import { readFileSync } from "fs";
 import onwarn from "./onwarn";
 import plugins from "./plugins/plugins";
 
-function getDefaultOptions(options: AzureBuildOptions) {
-  const defaultOptions: Partial<AzureBuildOptions> = {};
-  defaultOptions.library = true;
-  defaultOptions.libInput = getPkgJson(options).module;
-  defaultOptions.libOutput = "./dist";
-  defaultOptions.testOutput = "./dist-test"
-  defaultOptions.browserOutput = "./browser";
-  defaultOptions.nodeTestInput = options.testInput;
-  defaultOptions.browserTestInput = options.testInput;
-  return defaultOptions;
-}
-
-export function getRollupConfig(options: AzureBuildOptions): RollupOptions[] {
-  options = { ...getDefaultOptions(options), ...getEnvOptions(), ...options };
-
+export function createRollupConfig(def: AzureLibraryDefinition): RollupOptions[] {
   const configs: RollupOptions[] = [];
+  const options = getEnvOptions();
+  const defaults = getDefaults(def);
+  const pkgJson = getPkgJson(def);
 
-  if (options.library) {
-    if (options.node) {
-      configs.push(getBaseConfig({ platform: "node", test: false }, options));
-    }
+  for (const target of AZURE_BUILD_TARGETS.values()) {
+    const targetDef = def[target];
 
-    if (options.browser) {
-      configs.push(getBaseConfig({ platform: "browser", test: false }, options));
-    }
-  }
+    if (targetDef) {
+      const defWithDefaults: AzureTargetDefinition =
+        typeof targetDef === "boolean" ? defaults[target] : { ...defaults[target], ...targetDef };
 
-  if (options.tests) {
-    if (options.node) {
-      configs.push(getBaseConfig({ platform: "node", test: true }, options));
-    }
-
-    if (options.browser) {
-      configs.push(getBaseConfig({ platform: "browser", test: true }, options));
+      const config = getBaseConfig(target, defWithDefaults, pkgJson, options);
+      console.log("config for", target, defWithDefaults, config);
+      configs.push(config);
     }
   }
 
   return configs;
 }
 
-function getBaseConfig(target: AzureBuildTargetOptions, options: AzureBuildOptions): RollupOptions {
+function getDefaults(def: AzureLibraryDefinition) {
+  const mainName = getPkgJson(def).main;
+  const baseName = basename(mainName, extname(mainName));
+
+  return {
+    main: {
+      input: getPkgJson(def).module,
+      output: getPkgJson(def).main
+    },
+    testMain: {
+      input: "./dist-esm/test/**/*.spec.js",
+      output: `./dist-test/${baseName}.node.js`
+    },
+    browser: {
+      input: getPkgJson(def).module,
+      output:
+        typeof getPkgJson(def).browser === "string"
+          ? typeof getPkgJson(def).browser
+          : `./browser/${baseName}.js` // TODO: Could probably map main using the browser map here.
+    },
+    testBrowser: {
+      input: "./dist-esm/test/**/*.spec.js",
+      output: `./dist-test/${baseName}.node.js`
+    }
+  };
+}
+
+function getBaseConfig(
+  target: AzureBuildTarget,
+  targetDef: AzureTargetDefinition,
+  pkgJson: any,
+  options: AzureLibraryBuildOptions
+): RollupOptions {
   let external: string[] = [];
   let globalNames: any = {};
   let globalCount = 0;
 
-  const pkgJson = getPkgJson(options);
-
-  if (target.platform === "node") {
+  if (target === "main" || target === "testMain") {
     external = [
       ...nodeBuiltins,
       ...Object.keys(pkgJson.dependencies),
-      ...(target.test ? Object.keys(pkgJson.devDependencies) : [])
+      ...(target === "testMain" ? Object.keys(pkgJson.devDependencies) : [])
     ];
   } else {
     if (pkgJson.browser) {
@@ -67,42 +87,22 @@ function getBaseConfig(target: AzureBuildTargetOptions, options: AzureBuildOptio
       const disabledModules = [];
       for (const key of Object.keys(pkgJson.browser)) {
         if (pkgJson.browser[key] === false) {
-          disabledModules.push(key)
-          globalNames[key] = `$UNUSED_${globalCount++}`
+          disabledModules.push(key);
+          globalNames[key] = `$UNUSED_${globalCount++}`;
         }
       }
       external = disabledModules;
     }
   }
 
-  let inputFile;
-  let outputFile;
-  const base = basename(options.libInput, extname(options.libInput));
-  if (target.test) {
-    if (target.platform === "browser") {
-      inputFile = options.browserTestInput;
-      outputFile = join(options.testOutput, base + ".browser.js");
-    } else {
-      inputFile = options.nodeTestInput;
-      outputFile = join(options.testOutput, base + ".node.js");
-    }
-  } else {
-    inputFile = options.libInput;
-    if (target.platform === "browser") {
-      outputFile = join(options.browserOutput, base + ".js");
-    } else {
-      outputFile = join(options.libOutput, base + ".js");
-    }
-  }
-
   return {
-    input: inputFile,
+    input: targetDef.input,
     output: {
-      file: outputFile,
+      file: targetDef.output,
       sourcemap: true,
-      format: target.platform === "node" ? "cjs" : "umd",
+      format: target === "main" || target === "testMain" ? "cjs" : "umd",
       globals: globalNames,
-      name: options.browserGlobalName
+      name: targetDef.global
     },
     preserveSymlinks: false,
     external,
@@ -111,46 +111,44 @@ function getBaseConfig(target: AzureBuildTargetOptions, options: AzureBuildOptio
     onwarn,
 
     // some old plugin has the wrong type here, so any-cast
-    plugins: plugins(target, options) as any,
+    plugins: plugins(target, targetDef, options) as any,
 
     // Disable tree-shaking of test code.  In rollup-plugin-node-resolve@5.0.0, rollup started respecting
     // the "sideEffects" field in package.json.  Since our package.json sets "sideEffects=false", this also
     // applies to test code, which causes all tests to be removed by tree-shaking.
-    treeshake: !target.test
+    treeshake: isTestTarget(target)
   };
 }
 
-function getEnvOptions() {
-  const opts: Partial<AzureBuildOptions> = {};
+function getEnvOptions(): AzureLibraryBuildOptions {
+  const opts: Partial<AzureLibraryBuildOptions> = {};
 
-  if (process.env.BUILD_NODE !== undefined) {
-    opts.node = !!process.env.BUILD_NODE;
-  }
+  if (process.env.AZURE_BUILD_TARGETS !== undefined) {
+    const selectedTargets = process.env.AZURE_BUILD_TARGETS.split(",");
 
-  if (process.env.BUILD_BROWSER !== undefined) {
-    opts.browser = !!process.env.BUILD_BROWSER;
-  }
-
-  if (process.env.BUILD_LIBRARY !== undefined) {
-    opts.library = !!process.env.BUILD_LIBRARY;
-  }
-
-  if (process.env.BUILD_TESTS !== undefined) {
-    opts.tests = !!process.env.BUILD_TESTS;
+    if (isBuildTargetList(selectedTargets)) {
+      opts.targets = selectedTargets;
+    } else {
+      throw new Error("Invalid build target");
+    }
+  } else {
+    opts.targets = Array.from(AZURE_BUILD_TARGETS.values()) as AzureBuildTarget[];
   }
 
   if (process.env.BUILD_MINIFY !== undefined) {
-    opts.minify = !!process.env.BUILD_MINIFY;
+    opts.skipMinify = !!process.env.AZURE_BUILD_NO_MINIFY;
+  } else {
+    opts.skipMinify = false;
   }
 
-  return opts;
+  return opts as AzureLibraryBuildOptions;
 }
 
 let sourcePkgJson: any = undefined;
-function getPkgJson(options: AzureBuildOptions) {
+function getPkgJson(def: AzureLibraryDefinition) {
   if (sourcePkgJson) return sourcePkgJson;
 
-  const path = join(options.rootDir, "package.json");
+  const path = join(def.rootDir, "package.json");
   sourcePkgJson = JSON.parse(readFileSync(path, "utf-8"));
 
   return sourcePkgJson;

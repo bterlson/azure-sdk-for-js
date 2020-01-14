@@ -1,14 +1,14 @@
 import replace from "@rollup/plugin-replace";
-import { AzureBuildTargetOptions } from "../AzureBuildOptions";
+import { AzureBuildTarget, isNodeTarget, isBrowserTarget } from "../AzureBuildOptions";
 
-export default function(target: AzureBuildTargetOptions) {
+export default function(target: AzureBuildTarget) {
   return replace({
     delimiters: ["", ""],
     values: {
       // replace dynamic checks with if (true) since this is for node only.
       // Allows rollup's dead code elimination to be more aggressive.
-      "if (isNode)": `if (${target.platform === 'node'})`,
-      "if (!isNode)": `if (${target.platform === 'browser'})`
+      "if (isNode)": `if (${isNodeTarget(target)})`,
+      "if (!isNode)": `if (${isBrowserTarget(target)})`
     }
   });
 }

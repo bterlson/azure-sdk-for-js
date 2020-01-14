@@ -1,6 +1,4 @@
 import cjs from "rollup-plugin-commonjs";
-import { AzureBuildOptions } from "../AzureBuildOptions";
-import { AssertionError } from "assert";
 
 const KNOWN_NAMED_EXPORTS = {
   assert: [

@@ -1,8 +1,8 @@
-import { getRollupConfig } from "./dist-esm/buildConfig";
+import { createRollupConfig } from "./dist-esm/buildConfig";
 
-export default getRollupConfig({
+export default createRollupConfig({
   rootDir: __dirname,
-  node: true,
-  tests: false,
-  noReplace: true
-})
+  main: {
+    noReplace: true
+  }
+});

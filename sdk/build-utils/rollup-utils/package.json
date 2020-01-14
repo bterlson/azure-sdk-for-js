@@ -5,6 +5,7 @@
   "main": "./dist/buildConfig.js",
   "module": "./dist-esm/buildConfig.js",
   "scripts": {
+    "build": "tsc -p . && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
