@@ -62,8 +62,10 @@
     "@azure/logger": "^1.0.0",
     "tslib": "^2.0.0",
     "jsonwebtoken": "~8.5.1",
-    "express": "^4.16.3",
     "cloudevents": "^4.0.0"
+  },
+  "peerDependencies": {
+    "express": "^4.16.3"
   },
   "devDependencies": {
     "@azure/dev-tool": "^1.0.0",
